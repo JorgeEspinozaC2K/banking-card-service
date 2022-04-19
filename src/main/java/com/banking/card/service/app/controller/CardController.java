@@ -19,8 +19,6 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/api/v1/card")
 public class CardController {
-
-	private static final Logger log = LoggerFactory.getLogger(CardController.class);
 	
 	@Autowired
 	private CardService cardService;
