@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 
 
 @RestController
-@RequestMapping("/api/v1/card")
+@RequestMapping("/card")
 public class CardController {
 	
 	@Autowired
