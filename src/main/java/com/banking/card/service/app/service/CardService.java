@@ -38,4 +38,14 @@ public interface CardService {
 	 */
 	public Mono<Void> delete(Card card);
 	
+	/**
+	 * EN: This method delete a record
+	 * ES: Este metodo elimina un registro
+	 * @param card
+	 * @return
+	 */
+	public Mono<Card> findByCreditId(String creditId);
+	
+	public Mono<Card> findByCardNumber(Long cardNumber);
+	
 }

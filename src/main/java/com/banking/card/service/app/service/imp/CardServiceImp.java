@@ -27,17 +27,71 @@ public class CardServiceImp implements CardService{
 
 	@Override
 	public Mono<Card> findById(String id) {
-		return cardRepository.findById(id);
+		return cardRepository.findById(id)
+				.defaultIfEmpty(new Card())
+				.flatMap(_card ->{
+					if (_card.getId() == null) {
+						return Mono.error(new InterruptedException("Not found"));
+					}else {
+						return Mono.just(_card);
+					}
+				}).onErrorResume(_ex ->{
+					log.error(_ex.getMessage());
+					return Mono.empty();
+				});
 	}
 
 	@Override
 	public Mono<Card> save(Card card) {
-		return cardRepository.save(card);
+		return cardRepository.findByCardNumber(card.getCardNumber())
+		.defaultIfEmpty(new Card())
+		.flatMap(_card ->{
+			if (_card.getId() != null) {
+				return Mono.error(new InterruptedException("Choose another card number"));
+			}else {
+				return cardRepository.save(card);
+			}
+		}).onErrorResume(_ex ->{
+			log.error(_ex.getMessage());
+			return Mono.empty();
+		});
 	}
 
 	@Override
 	public Mono<Void> delete(Card card) {
 		return cardRepository.delete(card);
+	}
+
+	@Override
+	public Mono<Card> findByCreditId(String creditId) {
+		return cardRepository.findByCreditId(creditId)
+				.defaultIfEmpty(new Card())
+				.flatMap(_card ->{
+					if (_card.getId() == null) {
+						return Mono.error(new InterruptedException("Not found"));
+					}else {
+						return Mono.just(_card);
+					}
+				}).onErrorResume(_ex ->{
+					log.error(_ex.getMessage());
+					return Mono.empty();
+				});
+	}
+
+	@Override
+	public Mono<Card> findByCardNumber(Long cardNumber) {
+		return cardRepository.findByCardNumber(cardNumber)
+				.defaultIfEmpty(new Card())
+				.flatMap(_card ->{
+					if (_card.getId() == null) {
+						return Mono.error(new InterruptedException("Not found"));
+					}else {
+						return Mono.just(_card);
+					}
+				}).onErrorResume(_ex ->{
+					log.error(_ex.getMessage());
+					return Mono.empty();
+				});
 	}
 	
 }

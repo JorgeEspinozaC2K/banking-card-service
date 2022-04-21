@@ -19,11 +19,10 @@ public class Card {
 	
 	@Id
 	private String id;
-	private String creditId;
+	private String customerId;
 	private Integer ccv;
-	private String cardNumber;
+	private Long cardNumber;
 	private Date expiration;
-	private Date emision;
 	private Date createAt;
 	
 	

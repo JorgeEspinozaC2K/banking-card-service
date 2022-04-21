@@ -4,7 +4,7 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
 import com.banking.card.service.app.model.Card;
 
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public interface CardRepository extends ReactiveMongoRepository<Card, String> {
 
@@ -14,7 +14,7 @@ public interface CardRepository extends ReactiveMongoRepository<Card, String> {
 	 * @param creditId String
 	 * @return flux type card
 	 */
-	public Flux<Card> findByCreditId(String creditId);
+	public Mono<Card> findByCreditId(String creditId);
 	
 	/**
 	 * EN:  This method returns an account associateed with a card
@@ -22,6 +22,6 @@ public interface CardRepository extends ReactiveMongoRepository<Card, String> {
 	 * @param cardNumber
 	 * @return
 	 */
-	public Flux<Card> findByCardNumber(String cardNumber);
+	public Mono<Card> findByCardNumber(Long cardNumber);
 	
 }
