@@ -3,6 +3,7 @@ package com.banking.card.service.app.service.imp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.banking.card.service.app.model.Card;
 import com.banking.card.service.app.repository.CardRepository;
@@ -12,12 +13,12 @@ import com.banking.card.service.app.service.imp.CardServiceImp;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Service
 public class CardServiceImp implements CardService{
 
 	private static final Logger log = LoggerFactory.getLogger(CardServiceImp.class);
 	
 	@Autowired
-	//dependency injection required for the class work
 	private CardRepository cardRepository;
 
 	@Override
@@ -63,8 +64,8 @@ public class CardServiceImp implements CardService{
 	}
 
 	@Override
-	public Mono<Card> findByCreditId(String creditId) {
-		return cardRepository.findByCreditId(creditId)
+	public Mono<Card> findByCustomerId(String customerId) {
+		return cardRepository.findByCustomerId(customerId)
 				.defaultIfEmpty(new Card())
 				.flatMap(_card ->{
 					if (_card.getId() == null) {

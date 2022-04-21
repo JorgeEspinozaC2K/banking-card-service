@@ -44,7 +44,7 @@ public interface CardService {
 	 * @param card
 	 * @return
 	 */
-	public Mono<Card> findByCreditId(String creditId);
+	public Mono<Card> findByCustomerId(String customerId);
 	
 	public Mono<Card> findByCardNumber(Long cardNumber);
 	

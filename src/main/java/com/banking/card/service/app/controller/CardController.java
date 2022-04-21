@@ -23,7 +23,6 @@ public class CardController {
 	@Autowired
 	private CardService cardService;
 	
-	//This method displays all the information from the Card database
 	@GetMapping
 	public Flux<Card> index(){
 		return cardService.findAll();
@@ -34,8 +33,8 @@ public class CardController {
 	}
 	
 	@GetMapping("/cid/{id}")
-	public Mono<Card> findByCreditId(@PathVariable String id ) {
-		return cardService.findByCreditId(id);
+	public Mono<Card> findByCustomerId(@PathVariable String id ) {
+		return cardService.findByCustomerId(id);
 	}
 	@GetMapping("/cn/{cardNumber}")
 	public Mono<Card> findByCardNumber(@PathVariable Long cardNumber ) {

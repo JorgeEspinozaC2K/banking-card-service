@@ -14,7 +14,7 @@ public interface CardRepository extends ReactiveMongoRepository<Card, String> {
 	 * @param creditId String
 	 * @return flux type card
 	 */
-	public Mono<Card> findByCreditId(String creditId);
+	public Mono<Card> findByCustomerId(String customerId);
 	
 	/**
 	 * EN:  This method returns an account associateed with a card
