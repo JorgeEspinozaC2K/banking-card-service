@@ -1,9 +1,12 @@
 package com.banking.card.service.app.repository;
 
+import java.time.LocalDate;
+
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
 import com.banking.card.service.app.model.Card;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface CardRepository extends ReactiveMongoRepository<Card, String> {
@@ -23,5 +26,7 @@ public interface CardRepository extends ReactiveMongoRepository<Card, String> {
 	 * @return
 	 */
 	public Mono<Card> findByCardNumber(Long cardNumber);
+	
+	public Flux<Card> findByCreateAtAfter(LocalDate createAtF);
 	
 }

@@ -1,14 +1,24 @@
 package com.banking.card.service.app.service.imp;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.banking.card.service.app.entity.Account;
+import com.banking.card.service.app.entity.CreditRecord;
+import com.banking.card.service.app.entity.DepositRecord;
+import com.banking.card.service.app.entity.PayRecord;
+import com.banking.card.service.app.entity.TransferRecord;
+import com.banking.card.service.app.entity.WitdrawRecord;
 import com.banking.card.service.app.model.Card;
 import com.banking.card.service.app.repository.CardRepository;
 import com.banking.card.service.app.service.CardService;
 import com.banking.card.service.app.service.imp.CardServiceImp;
+import com.banking.card.service.app.webclient.CardWebClient;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -20,6 +30,8 @@ public class CardServiceImp implements CardService{
 	
 	@Autowired
 	private CardRepository cardRepository;
+	
+	private CardWebClient cardWebClient = new CardWebClient();	
 
 	@Override
 	public Flux<Card> findAll() {
@@ -44,6 +56,13 @@ public class CardServiceImp implements CardService{
 
 	@Override
 	public Mono<Card> save(Card card) {
+		
+		List<Account> accounts = cardWebClient.findAccounts(card.getCustomerId())
+				.defaultIfEmpty(new Account())
+				.collectList().block();
+		
+		card.setAllAccounts(accounts);
+		
 		return cardRepository.findByCardNumber(card.getCardNumber())
 		.defaultIfEmpty(new Card())
 		.flatMap(_card ->{
@@ -93,6 +112,37 @@ public class CardServiceImp implements CardService{
 					log.error(_ex.getMessage());
 					return Mono.empty();
 				});
+	}
+
+	@Override
+	public Flux<Card> findByCreateAtBetween(LocalDate createAtF, LocalDate createAtL) {
+		return cardRepository.findByCreateAtAfter(createAtF)
+				.filter(c-> c.getCreateAt().isBefore(createAtL==null? LocalDate.now(): createAtL));
+	}
+
+	@Override
+	public Mono<Double> amountConsult(Long cardNumber) {
+		String accountId = cardRepository.findByCardNumber(cardNumber).defaultIfEmpty(new Card())
+							.flatMap(c -> c.getId()==null ? Mono.error(new InterruptedException("Card does not exist")):
+							Mono.just(c)).block().getAccountId();
+		return cardWebClient.amountConsult(accountId);
+	}
+
+	@Override
+	public Flux<Object> creditCardTenLast(Long cardNumber) {
+		Flux<CreditRecord> creditRecords = cardWebClient.lastTenCredit(cardNumber);
+		Flux<PayRecord> paymentRecords= cardWebClient.lastTenPayment(cardNumber);
+		
+		return Flux.merge(creditRecords,paymentRecords).limitRate(10);
+	}
+
+	@Override
+	public Flux<Object> debitCardTenLast(Long cardNumber) {
+		Flux<DepositRecord> despositRecords = cardWebClient.lastTenDeposit(cardNumber);
+		Flux<TransferRecord> transferRecords = cardWebClient.lastTenTransfer(cardNumber);
+		Flux<WitdrawRecord> witdrawRecords = cardWebClient.lastTenWitdrawal(cardNumber);
+		
+		return Flux.merge(despositRecords,transferRecords,witdrawRecords).limitRate(10);
 	}
 	
 }

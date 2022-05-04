@@ -1,5 +1,7 @@
 package com.banking.card.service.app.service;
 
+import java.time.LocalDate;
+
 import com.banking.card.service.app.model.Card;
 
 import reactor.core.publisher.Flux;
@@ -47,5 +49,13 @@ public interface CardService {
 	public Mono<Card> findByCustomerId(String customerId);
 	
 	public Mono<Card> findByCardNumber(Long cardNumber);
+	
+	public Flux<Card> findByCreateAtBetween(LocalDate createAtF,LocalDate createAtL);
+	
+	public Mono<Double> amountConsult(Long cardNumber);
+	
+	public Flux<Object> creditCardTenLast(Long cardNumber);
+	
+	public Flux<Object> debitCardTenLast(Long cardNumber);
 	
 }
