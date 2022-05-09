@@ -1,7 +1,6 @@
 package com.banking.card.service.app.service.imp;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,20 +56,20 @@ public class CardServiceImp implements CardService{
 	@Override
 	public Mono<Card> save(Card card) {
 		
-		List<Account> accounts = cardWebClient.findAccounts(card.getCustomerId())
-				.defaultIfEmpty(new Account())
-				.collectList().block();
-		
-		card.setAllAccounts(accounts);
-		
-		return cardRepository.findByCardNumber(card.getCardNumber())
-		.defaultIfEmpty(new Card())
-		.flatMap(_card ->{
-			if (_card.getId() != null) {
-				return Mono.error(new InterruptedException("Choose another card number"));
-			}else {
-				return cardRepository.save(card);
-			}
+		return cardWebClient.findAccounts(card.getCustomerId())
+		.defaultIfEmpty(new Account())
+		.collectList()
+		.flatMap(accounts->{
+			card.setAllAccounts(accounts);
+			return cardRepository.findByCardNumber(card.getCardNumber())
+					.defaultIfEmpty(new Card())
+					.flatMap(_card ->{
+						if (_card.getId() != null) {
+							return Mono.error(new InterruptedException("Choose another card number"));
+						}else {
+							return cardRepository.save(card);
+						}
+					});
 		}).onErrorResume(_ex ->{
 			log.error(_ex.getMessage());
 			return Mono.empty();
@@ -122,10 +121,9 @@ public class CardServiceImp implements CardService{
 
 	@Override
 	public Mono<Double> amountConsult(Long cardNumber) {
-		String accountId = cardRepository.findByCardNumber(cardNumber).defaultIfEmpty(new Card())
+		return cardRepository.findByCardNumber(cardNumber).defaultIfEmpty(new Card())
 							.flatMap(c -> c.getId()==null ? Mono.error(new InterruptedException("Card does not exist")):
-							Mono.just(c)).block().getAccountId();
-		return cardWebClient.amountConsult(accountId);
+								cardWebClient.amountConsult(c.getAccountId()));
 	}
 
 	@Override
