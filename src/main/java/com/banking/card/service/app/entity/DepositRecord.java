@@ -8,7 +8,8 @@ import lombok.Data;
 public class DepositRecord {
 	private String id;
 	private Double amountDeposit;
-	private Long fromAnotherAccount;
+	private Long accountNumber;
+	private Boolean fromAnotherAccount;
 	private Long accountNumberFrom;
 	private String note = "Deposit creation";
 	private LocalDate operationDate;

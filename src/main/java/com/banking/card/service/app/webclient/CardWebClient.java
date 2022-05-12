@@ -1,7 +1,10 @@
 package com.banking.card.service.app.webclient;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.circuitbreaker.ReactiveCircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.ReactiveCircuitBreakerFactory;
+import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClient.Builder;
 
 import com.banking.card.service.app.entity.Account;
 import com.banking.card.service.app.entity.CreditRecord;
@@ -13,25 +16,37 @@ import com.banking.card.service.app.entity.WitdrawRecord;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-
+@Service
 public class CardWebClient {
 	
-	private Builder cardWebClient = WebClient.builder();
+	@SuppressWarnings("rawtypes")
+	@Autowired
+	private ReactiveCircuitBreakerFactory reactiveCircuitBreakerFactory;
 	
 	public Flux<Account> findAccounts(String accountId){
-		return cardWebClient.build()
+		return WebClient
+				.create("http://localhost:8080")
 				.get()
-				.uri("http://localhost:8080/account/{id}",accountId)
+				.uri("/account/{id}",accountId)
 				.retrieve()
-				.bodyToFlux(Account.class);
+				.bodyToFlux(Account.class)
+				.transformDeferred(it -> {
+                    ReactiveCircuitBreaker rcb = reactiveCircuitBreakerFactory.create("customDefaultCB");
+                    return rcb.run(it, throwable -> Flux.empty());
+                });
 	}
 	
 	public Mono<Double> amountConsult(String accountId){
-		return cardWebClient.build()
+		return WebClient
+				.create("http://localhost:8080")
 				.get()
-				.uri("http://localhost:8080/account/amount/{id}",accountId)
+				.uri("/account/amount/{id}",accountId)
 				.retrieve()
-				.bodyToMono(Double.class);
+				.bodyToMono(Double.class)
+				.transformDeferred(it -> {
+                    ReactiveCircuitBreaker rcb = reactiveCircuitBreakerFactory.create("customDefaultCB");
+                    return rcb.run(it, throwable -> Mono.empty());
+                });
 	}
 	
 	/**
@@ -40,11 +55,16 @@ public class CardWebClient {
 	 * @return
 	 */
 	public Flux<CreditRecord> lastTenCredit(Long cardNumber){
-		return cardWebClient.build()
+		return WebClient
+				.create("http://localhost:8080")
 				.get()
-				.uri("http://localhost:8080/credit/lastTen/{cardNumber}",cardNumber)
+				.uri("/credit/lastTen/{cardNumber}",cardNumber)
 				.retrieve()
-				.bodyToFlux(CreditRecord.class);
+				.bodyToFlux(CreditRecord.class)
+				.transformDeferred(it -> {
+                    ReactiveCircuitBreaker rcb = reactiveCircuitBreakerFactory.create("customDefaultCB");
+                    return rcb.run(it, throwable -> Flux.empty());
+                });
 	}
 	
 	/**
@@ -53,11 +73,16 @@ public class CardWebClient {
 	 * @return
 	 */
 	public Flux<PayRecord> lastTenPayment(Long cardNumber){
-		return cardWebClient.build()
+		return WebClient
+				.create("http://localhost:8080")
 				.get()
-				.uri("http://localhost:8080/payment/lastTen/{cardNumber}",cardNumber)
+				.uri("/payment/lastTen/{cardNumber}",cardNumber)
 				.retrieve()
-				.bodyToFlux(PayRecord.class);
+				.bodyToFlux(PayRecord.class)
+				.transformDeferred(it -> {
+                    ReactiveCircuitBreaker rcb = reactiveCircuitBreakerFactory.create("customDefaultCB");
+                    return rcb.run(it, throwable -> Flux.empty());
+                });
 	}
 	
 	/**
@@ -66,11 +91,16 @@ public class CardWebClient {
 	 * @return
 	 */
 	public Flux<DepositRecord> lastTenDeposit(Long cardNumber){
-		return cardWebClient.build()
+		return WebClient
+				.create("http://localhost:8080")
 				.get()
-				.uri("http://localhost:8080/deposit/lastTen/{cardNumber}",cardNumber)
+				.uri("/deposit/lastTen/{cardNumber}",cardNumber)
 				.retrieve()
-				.bodyToFlux(DepositRecord.class);
+				.bodyToFlux(DepositRecord.class)
+				.transformDeferred(it -> {
+                    ReactiveCircuitBreaker rcb = reactiveCircuitBreakerFactory.create("customDefaultCB");
+                    return rcb.run(it, throwable -> Flux.empty());
+                });
 	}
 	
 	/**
@@ -79,11 +109,16 @@ public class CardWebClient {
 	 * @return
 	 */
 	public Flux<TransferRecord> lastTenTransfer(Long cardNumber){
-		return cardWebClient.build()
+		return WebClient
+				.create("http://localhost:8080")
 				.get()
-				.uri("http://localhost:8080/transaction/lastTen/{cardNumber}",cardNumber)
+				.uri("/transaction/lastTen/{cardNumber}",cardNumber)
 				.retrieve()
-				.bodyToFlux(TransferRecord.class);
+				.bodyToFlux(TransferRecord.class)
+				.transformDeferred(it -> {
+                    ReactiveCircuitBreaker rcb = reactiveCircuitBreakerFactory.create("customDefaultCB");
+                    return rcb.run(it, throwable -> Flux.empty());
+                });
 	}
 	
 	/**
@@ -92,10 +127,14 @@ public class CardWebClient {
 	 * @return
 	 */
 	public Flux<WitdrawRecord> lastTenWitdrawal(Long cardNumber){
-		return cardWebClient.build()
+		return WebClient
+				.create("http://localhost:8080")
 				.get()
-				.uri("http://localhost:8080/witdrawal/lastTen/{cardNumber}",cardNumber)
+				.uri("/witdrawal/lastTen/{cardNumber}",cardNumber)
 				.retrieve()
-				.bodyToFlux(WitdrawRecord.class);
+				.bodyToFlux(WitdrawRecord.class).transformDeferred(it -> {
+                    ReactiveCircuitBreaker rcb = reactiveCircuitBreakerFactory.create("customDefaultCB");
+                    return rcb.run(it, throwable -> Flux.empty());
+                });
 	}
 }

@@ -30,7 +30,8 @@ public class CardServiceImp implements CardService{
 	@Autowired
 	private CardRepository cardRepository;
 	
-	private CardWebClient cardWebClient = new CardWebClient();	
+	@Autowired
+	private CardWebClient cardWebClient;	
 
 	@Override
 	public Flux<Card> findAll() {
